@@ -3,11 +3,10 @@ from datetime import datetime
 import pathlib
 import requests
 import resourceType
-fhir = 'http://104.208.68.39:8080/fhir/'#4600VM
+
+#fhir = 'http://104.208.68.39:8080/fhir/'#4600VM
 #fhir = 'http://202.5.253.182:8080/fhir/'#mshtest
-#fhir = "http://61.67.8.220:8080/fhir/"#skh outside
-#fhir = "http://10.2.1.17:8080/fhir/"#skh inside
-#fhir = "http://106.105.181.72:8080/fhir/"#tpech
+fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
 
 def component2section(component_dict):
     section = {
@@ -25,9 +24,9 @@ def component2section(component_dict):
             }
         section['code']['coding'].append(coding)
         section['title'] = component_dict['section']['title']
-        print(section['title'])
-        print(type(component_dict['section']['text']))
-        print(component_dict['section']['text'])
+        #print(section['title'])
+        #print(type(component_dict['section']['text']))
+        #print(component_dict['section']['text'])
         if type(component_dict['section']['text'])==str:
             paragraphText=component_dict['section']['text'] + '\n'
         elif type(component_dict['section']['text'])==dict:
@@ -35,7 +34,7 @@ def component2section(component_dict):
             try:
                 for paragraph in  component_dict['section']['text']['paragraph']:
                     paragraphText = paragraphText + paragraph + '\n'
-                print(paragraphText)
+                #print(paragraphText)
             except:
                 #['section']['text']['table']
                 for head in component_dict['section']['text']['table']['thead']['tr']['td']:
@@ -304,7 +303,7 @@ def PostVisitNote(record, VisitNote_Id):
         #    Compositionjson['section'].append(component2section(xmldict['component']['structuredBody']['component'][i]))
         component_list = Postxml['component']['structuredBody']['component']
         for i in range(len(component_list)):
-            print(i)
+            #print(i)
             Compositionjson['section'].append(component2section(component_list[i]))
         url = fhir + 'Composition/'+ VisitNote_Id
         headers = {
@@ -318,7 +317,6 @@ def PostVisitNote(record, VisitNote_Id):
         #print(response.text)
         resultjson=json.loads(response.text)
         #return (Compositionjson, 201)
-        return (resultjson, response.status_code)
-    
+        return (resultjson, response.status_code)    
     except:
         return ({'NG'})
