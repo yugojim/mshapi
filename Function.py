@@ -58,15 +58,18 @@ def component2section(component_dict):
         try:
             for component in  component_dict['section']['component'] :
                 paragraphText = paragraphText + component['section']['title'] + ' :\n'
-                if type(component['section']['text']['paragraph'])==list:
+                try:
+                    #if type(component['section']['text'])==list:
                     for paragraph in component['section']['text']['paragraph']:
                         paragraphText = paragraphText + str(paragraph) + '\n'                        
-                else:
+                #else:                    
+                except:
                     paragraphText = paragraphText + str(component['section']['text']) + '\n'
-                paragraphText = paragraphText + '\n'                    
+                paragraphText = paragraphText + '\n'
+                print(paragraphText)                    
         except:
             None
-        #print(paragraphText)    
+            
         section['text'] =  {'status' : 'additional', 'div' : '<div xmlns=\"http://www.w3.org/1999/xhtml\">' + str(paragraphText) + '</div>' } 
         
         try:
