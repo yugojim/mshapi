@@ -4,9 +4,9 @@ import pathlib
 import requests
 import resourceType
 
-#fhir = 'http://104.208.68.39:8080/fhir/'#4600VM
+fhir = 'http://104.208.68.39:8080/fhir/'#4600VM
 #fhir = 'http://202.5.253.182:8080/fhir/'#mshtest
-fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
+#fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
 
 def component2section(component_dict):
     section = {
@@ -66,11 +66,11 @@ def component2section(component_dict):
                 except:
                     paragraphText = paragraphText + str(component['section']['text']) + '\n'
                 paragraphText = paragraphText + '\n'
-                print(paragraphText)                    
+                #print(paragraphText)                    
         except:
             None
             
-        section['text'] =  {'status' : 'additional', 'div' : '<div xmlns=\"http://www.w3.org/1999/xhtml\">' + str(paragraphText) + '</div>' } 
+        section['text'] =  {'status' : 'additional', 'div' : '<div xmlns=\"http://www.w3.org/1999/xhtml\">' + str(paragraphText).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;') + '</div>' } 
         
         try:
             #print(type(component_dict['section']['entry']))
@@ -128,7 +128,8 @@ def component2section(component_dict):
                 except:
                     None
             else:
-                print(type(component_dict['section']['entry']))                
+                None
+                #print(type(component_dict['section']['entry']))                
         except:
             None
         #print(section['entry'])
