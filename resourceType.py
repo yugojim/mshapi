@@ -1,4 +1,4 @@
-def patientjson(patientid,name,given,gender,birthDate):
+def patientjson(patientid,given,name,gender,birthDate):
     patient={}
     patient["resourceType"] = "Patient"
     patient["identifier"] =  [
@@ -21,8 +21,8 @@ def patientjson(patientid,name,given,gender,birthDate):
     ]
     patient["id"] = patientid
     patient["name"] = [
-        {
-            "name": name ,
+        {        
+            "family": name ,
             "given": [ given ]
         }
     ]
