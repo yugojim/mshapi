@@ -29,6 +29,47 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 def serverstatus():
     return jsonify({'Server Status' : 'run'}), 200
 
+###Consent ###
+@app.route('/Consent/', methods=['GET'])
+@cross_origin()
+def query_Context():
+    url = fhir + 'Consent?'
+    response = requests.request("GET", url, headers={}, data={}, verify=False)
+    resultjson=json.loads(response.text)
+    return jsonify(resultjson), 200
+    
+@app.route('/Consent/<string:Consent_Id>', methods=['GET'])
+@cross_origin()
+def query_ContextID(Consent_Id):
+    url = fhir + 'Consent/' + Consent_Id
+    response = requests.request("GET", url, headers={}, data={}, verify=False)
+    resultjson=json.loads(response.text)
+    return jsonify(resultjson), 200
+
+@app.route('/Consent/<string:Consent_Id>', methods=['POST'])
+@cross_origin()
+def create_Context(Consent_Id):
+    #record = xmltodict.parse(request.data)
+    record = json.loads(request.data)
+    Composition, status_code = Function.PostConsent(record, Consent_Id)
+    return jsonify(Composition), status_code
+
+@app.route('/Consent/<string:Consent_Id>', methods=['PUT'])
+@cross_origin()
+def update_Context(Consent_Id):
+    #record = xmltodict.parse(request.data)
+    record = json.loads(request.data, strict=False)
+    Composition, status_code = Function.PostConsent(record, Consent_Id)
+    return jsonify(Composition), status_code    
+    
+@app.route('/Consent/<string:Consent_Id>', methods=['DELETE'])
+@cross_origin()
+def delte_Context(Consent_Id):
+    url = fhir + 'Context/' + Consent_Id
+    response = requests.request("DELETE", url, headers={}, data={}, verify=False)
+    resultjson=json.loads(response.text)
+    return jsonify(resultjson), 200
+
 ###DischargeSummary###
 @app.route('/DischargeSummary/', methods=['GET'])
 @cross_origin()

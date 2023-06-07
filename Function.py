@@ -324,3 +324,59 @@ def PostVisitNote(record, VisitNote_Id):
         return (resultjson, response.status_code)    
     except:
         return ({'NG'})
+
+def PostConsent(record, Consent_Id):
+    try:
+        CompositionjsonPath=str(pathlib.Path().absolute()) + "/Consent.json"
+        Compositionjson = json.load(open(CompositionjsonPath,encoding="utf-8"), strict=False)
+        
+        Compositionjson['id'] = Consent_Id
+        Compositionjson['status'] = "active"
+        Compositionjson['dateTime']=datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        Compositionjson['provision']['type']="permit"
+        
+        '''
+        ###patientjson###
+        #try:
+        url = fhir + "Patient/" + str(Postxml['recordTarget']['patientRole']['patient']['id']['@extension'])
+        response = requests.request("GET", url )
+        #print(response.status_code)
+        if response.status_code == 404:
+            if Postxml['recordTarget']['patientRole']['patient']['administrativeGenderCode']['@code']  == 'F':
+                gender='female'
+            elif Postxml['recordTarget']['patientRole']['patient']['administrativeGenderCode']['@code']  == 'M':
+                gender='male'
+            else:
+                gender='unknow'
+            BIRTH_DATE = Postxml['recordTarget']['patientRole']['patient']['birthTime']['@value'][0:4] + '-' + Postxml['recordTarget']['patientRole']['patient']['birthTime']['@value'][4:6] + '-' + Postxml['recordTarget']['patientRole']['patient']['birthTime']['@value'][6:8] 
+            patientjson = resourceType.patientjson(str(Postxml['recordTarget']['patientRole']['patient']['id']['@extension']), Postxml['recordTarget']['patientRole']['patient']['name'][1:], Postxml['recordTarget']['patientRole']['patient']['name'][0],\
+                                                   gender, BIRTH_DATE)    
+            headers = {'Content-Type': 'application/json'}
+            payload = json.dumps(patientjson)
+            response = requests.request("PUT", url, headers=headers, data=payload)
+        #print(response.status_code)
+        #if response.status_code != 400:
+        Compositionjson['subject']['reference'] = 'Patient/' + str(Postxml['recordTarget']['patientRole']['patient']['id']['@extension'])
+        #except:
+        #    None
+        ###
+        '''
+        url = fhir + 'Consent/'+ Consent_Id
+        headers = {
+          'Content-Type': 'application/json'
+        }
+        #print(Compositionjson)
+        payload = json.dumps(Compositionjson)
+        #print(payload)
+        print(url)
+        
+        response = requests.request("PUT", url, headers=headers, data=payload)
+        
+        #print(response.text)
+        resultjson=json.loads(response.text)
+
+        #return (Compositionjson, 201)
+        return (resultjson, response.status_code)
+    
+    except:
+        return ({'NG'})
