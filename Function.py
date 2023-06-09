@@ -6,7 +6,9 @@ import resourceType
 
 #fhir = 'http://104.208.68.39:8080/fhir/'#4600VM
 #fhir = 'http://202.5.253.182:8080/fhir/'#mshtest
-fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
+#fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
+fhir = 'http://103.124.74.158:8080/fhir/'#mshfhir
+
 
 def component2section(component_dict):
     section = {
@@ -368,7 +370,7 @@ def PostConsent(record, Consent_Id):
         #print(Compositionjson)
         payload = json.dumps(Compositionjson)
         #print(payload)
-        print(url)
+        #print(url)
         
         response = requests.request("PUT", url, headers=headers, data=payload)
         
