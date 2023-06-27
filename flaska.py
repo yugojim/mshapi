@@ -120,15 +120,23 @@ def query_VisitNote():
     Search=''
     if request.args.get('Patient_Id') != None:
         Search = 'patient=' + request.args.get('Patient_Id') + '&'
-    if request.args.get('mtDate') != None:
-        Search = Search + 'date=ge' + request.args.get('mtDate') + '&'        
-    if request.args.get('ltDate') != None:
-        Search = Search + 'date=le' + request.args.get('ltDate')
-    url = fhir + 'Composition/?' + Search #+ 'title=門診'
-    #print(url)
-    response = requests.request("GET", url, headers={}, data={}, verify=False)
-    resultjson=json.loads(response.text)
-    return jsonify(resultjson), 200
+        Consenturl = fhir + 'Consent/' + str(request.args.get('Patient_Id'))
+        #print(Consenturl)
+        Consenturlresponse = requests.request("GET", Consenturl, headers={}, data={}, verify=False)
+        Consenturlresponseresultjson=json.loads(Consenturlresponse.text)
+        if Consenturlresponse.status_code != 404:
+            if request.args.get('mtDate') != None:
+                Search = Search + 'date=ge' + request.args.get('mtDate') + '&'        
+            if request.args.get('ltDate') != None:
+                Search = Search + 'date=le' + request.args.get('ltDate')           
+            url = fhir + 'Composition/?' + Search + '&_count=100&_sort=-date'
+            #+ 'title=門診'
+            #print(url)
+            response = requests.request("GET", url, headers={}, data={}, verify=False)
+            resultjson=json.loads(response.text)
+            return jsonify(resultjson), 200
+        else:
+            return jsonify(Consenturlresponseresultjson), 404
 '''
 #skh
 @app.route('/VisitNote/', methods=['GET'])
@@ -142,10 +150,16 @@ def query_VisitNote():
 @app.route('/VisitNote/<string:VisitNote_Id>', methods=['GET'])
 @cross_origin()
 def query_VisitNoteID(VisitNote_Id):
-    url = fhir + 'Composition/' + VisitNote_Id
-    response = requests.request("GET", url, headers={}, data={}, verify=False)
-    resultjson=json.loads(response.text)
-    return jsonify(resultjson), 200
+    Consenturl = fhir + 'Consent/' + VisitNote_Id
+    Consenturlresponse = requests.request("GET", Consenturl, headers={}, data={}, verify=False)
+    Consenturlresponseresultjson=json.loads(Consenturlresponse.text)
+    if Consenturlresponse.status_code != 404:
+        url = fhir + 'Composition/' + VisitNote_Id
+        response = requests.request("GET", url, headers={}, data={}, verify=False)
+        resultjson=json.loads(response.text)
+        return jsonify(resultjson), 200
+    else:
+        return jsonify(Consenturlresponseresultjson), 404
 
 @app.route('/VisitNote/<string:VisitNote_Id>', methods=['POST'])
 @cross_origin()
