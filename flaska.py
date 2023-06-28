@@ -129,7 +129,7 @@ def query_VisitNote():
                 Search = Search + 'date=ge' + request.args.get('mtDate') + '&'        
             if request.args.get('ltDate') != None:
                 Search = Search + 'date=le' + request.args.get('ltDate')           
-            url = fhir + 'Composition/?' + Search + '&_count=100&_sort=-date'
+            url = fhir + 'Composition/?' + Search + '&_count=365&_sort=-date'
             #+ 'title=門診'
             #print(url)
             response = requests.request("GET", url, headers={}, data={}, verify=False)
