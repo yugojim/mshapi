@@ -9,6 +9,25 @@ import resourceType
 fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
 #fhir = 'http://103.124.74.158:8080/fhir/'#mshfhir
 
+apikey="Pw4jsj8hxJJQTY1I"
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import hashes
+
+Depositurl = "https://tproof-dev.twcc.ai/api/v1/tproof/deposit"
+Evidenceurl = "https://tproof-dev.twcc.ai/api/v1/tproof/forensics"
+
+# Read the content of the private key.
+with open('mytproof.key', 'rb') as key_file:
+    private_key = serialization.load_pem_private_key(
+        key_file.read(),
+        password=None,
+        backend=default_backend()
+    )
+Deposit={}
+Deposit['apikey']= apikey
 
 def component2section(component_dict):
     section = {
@@ -331,38 +350,28 @@ def PostConsent(record, Consent_Id):
     try:
         CompositionjsonPath=str(pathlib.Path().absolute()) + "/Consent.json"
         Compositionjson = json.load(open(CompositionjsonPath,encoding="utf-8"), strict=False)
-        
+        try:
+            string_to_sign = str.encode(Consent_Id)
+            signature = private_key.sign(
+                string_to_sign,
+                padding.PKCS1v15(),
+                hashes.SHA256()
+            )
+            Deposit['data']=[{"signature":signature.hex(),"tags": ["consent"]}]
+            headers = {
+              'Content-Type': 'application/json'
+            }
+            Depositresponse = requests.request("post", Depositurl, headers=headers, data=json.dumps(Deposit))
+            tokenId=json.loads(Depositresponse.text)['data'][0]
+            tpoof={"status": "generated",  "div": '<div xmlns=\"http://www.w3.org/1999/xhtml\">' + apikey + ',' + tokenId + '</div>' }
+            Compositionjson['text']=tpoof
+        except:
+            None
         Compositionjson['id'] = Consent_Id
         Compositionjson['status'] = "active"
         Compositionjson['dateTime']=datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
         Compositionjson['provision']['type']="permit"
         
-        '''
-        ###patientjson###
-        #try:
-        url = fhir + "Patient/" + str(Postxml['recordTarget']['patientRole']['patient']['id']['@extension'])
-        response = requests.request("GET", url )
-        #print(response.status_code)
-        if response.status_code == 404:
-            if Postxml['recordTarget']['patientRole']['patient']['administrativeGenderCode']['@code']  == 'F':
-                gender='female'
-            elif Postxml['recordTarget']['patientRole']['patient']['administrativeGenderCode']['@code']  == 'M':
-                gender='male'
-            else:
-                gender='unknow'
-            BIRTH_DATE = Postxml['recordTarget']['patientRole']['patient']['birthTime']['@value'][0:4] + '-' + Postxml['recordTarget']['patientRole']['patient']['birthTime']['@value'][4:6] + '-' + Postxml['recordTarget']['patientRole']['patient']['birthTime']['@value'][6:8] 
-            patientjson = resourceType.patientjson(str(Postxml['recordTarget']['patientRole']['patient']['id']['@extension']), Postxml['recordTarget']['patientRole']['patient']['name'][1:], Postxml['recordTarget']['patientRole']['patient']['name'][0],\
-                                                   gender, BIRTH_DATE)    
-            headers = {'Content-Type': 'application/json'}
-            payload = json.dumps(patientjson)
-            response = requests.request("PUT", url, headers=headers, data=payload)
-        #print(response.status_code)
-        #if response.status_code != 400:
-        Compositionjson['subject']['reference'] = 'Patient/' + str(Postxml['recordTarget']['patientRole']['patient']['id']['@extension'])
-        #except:
-        #    None
-        ###
-        '''
         url = fhir + 'Consent/'+ Consent_Id
         headers = {
           'Content-Type': 'application/json'
@@ -382,3 +391,4 @@ def PostConsent(record, Consent_Id):
     
     except:
         return ({'NG'})
+
