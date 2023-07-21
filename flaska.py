@@ -28,7 +28,12 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @app.route('/', methods=['GET'])
 @cross_origin()
 def serverstatus():
-    return jsonify({'Server Status' : 'run'}), 200
+    ip_addr = request.remote_addr
+    host_url  = request.host_url 
+    headers=dict(request.headers)
+    method = request.method
+    #row=Function.postlog(request)
+    return jsonify({'Server Status' : 'run','ip_addr' : ip_addr,'host_url' : host_url,'headers':headers,'method':method}), 200
 
 ###Consent ###
 @app.route('/Consent/', methods=['GET'])
@@ -51,16 +56,16 @@ def query_ContextID(Consent_Id):
 @cross_origin()
 def create_Context(Consent_Id):
     #record = xmltodict.parse(request.data)
-    record = json.loads(request.data)
-    Composition, status_code = Function.PostConsent(record, Consent_Id)
+    #record = json.loads(request.data)
+    Composition, status_code = Function.PostConsent(Consent_Id)
     return jsonify(Composition), status_code
 
 @app.route('/Consent/<string:Consent_Id>', methods=['PUT'])
 @cross_origin()
 def update_Context(Consent_Id):
     #record = xmltodict.parse(request.data)
-    record = json.loads(request.data, strict=False)
-    Composition, status_code = Function.PostConsent(record, Consent_Id)
+    #record = json.loads(request.data, strict=False)
+    Composition, status_code = Function.PostConsent(Consent_Id)
     return jsonify(Composition), status_code    
     
 @app.route('/Consent/<string:Consent_Id>', methods=['DELETE'])
@@ -117,6 +122,7 @@ def delte_DischargeSummary(DischargeSummary_Id):
 @app.route('/VisitNote/', methods=['GET'])
 @cross_origin()
 def query_VisitNote():
+    Function.postlog(request)
     Search=''
     if request.args.get('Patient_Id') != None:
         Search = 'patient=' + request.args.get('Patient_Id') + '&'
@@ -164,6 +170,7 @@ def query_VisitNoteID(VisitNote_Id):
 @app.route('/VisitNote/<string:VisitNote_Id>', methods=['POST'])
 @cross_origin()
 def create_VisitNote(VisitNote_Id):
+    Function.postlog(request)
     record = xmltodict.parse(request.data)
     Composition, status_code = Function.PostVisitNote(record, VisitNote_Id)
     return jsonify(Composition), status_code
@@ -171,6 +178,7 @@ def create_VisitNote(VisitNote_Id):
 @app.route('/VisitNote/<string:VisitNote_Id>', methods=['PUT'])
 @cross_origin()
 def update_VisitNote(VisitNote_Id):
+    Function.postlog(request)
     record = xmltodict.parse(request.data)
     Composition, status_code = Function.PostVisitNote(record, VisitNote_Id)
     return jsonify(Composition), status_code    
@@ -178,6 +186,7 @@ def update_VisitNote(VisitNote_Id):
 @app.route('/VisitNote/<string:VisitNote_Id>', methods=['DELETE'])
 @cross_origin()
 def delte_VisitNote(VisitNote_Id):
+    Function.postlog(request)
     url = fhir + 'Composition/' + VisitNote_Id
     response = requests.request("DELETE", url, headers={}, data={}, verify=False)
     resultjson=json.loads(response.text)

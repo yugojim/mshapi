@@ -3,6 +3,8 @@ from datetime import datetime
 import pathlib
 import requests
 import resourceType
+import psycopg2
+
 
 #fhir = 'http://104.208.68.39:8080/fhir/'#4600VM
 #fhir = 'http://202.5.253.182:8080/fhir/'#mshtest
@@ -28,6 +30,29 @@ with open('mytproof.key', 'rb') as key_file:
     )
 Deposit={}
 Deposit['apikey']= apikey
+
+def postlog(request):
+    ip_addr = request.remote_addr
+    method = request.method
+    host_url  = request.host_url
+    headers=dict(request.headers)
+    conn = psycopg2.connect(database="consent", user="postgres", password="1qaz@WSX3edc", host="203.145.222.60", port="5432")
+    #print('Opened database')
+    cur = conn.cursor()
+    #sql="INSERT INTO public.log (ip_addr, method, host_url, headers, datetime ) VALUES ( '123.123.123.123', 'GET', 'http://1', 'header', '2023-10-11 08:12:22');"
+    sql="INSERT INTO public.log (ip_addr, method, host_url, headers, datetime ) VALUES ('" + ip_addr + "', '" + \
+            method + "', '" + host_url + "', '" + json.dumps(headers) + "', '" + datetime.now().strftime("%Y/%m/%d %H:%M:%S") + "');"
+    #print(sql)
+    cur.execute(sql)
+    conn.commit()
+    
+    cur.execute('SELECT * FROM public.log')
+    rows = cur.fetchall()
+    #for row in rows:
+        #print(row)
+    conn.close()
+    #print('Close database')
+    return rows
 
 def component2section(component_dict):
     section = {
@@ -346,7 +371,7 @@ def PostVisitNote(record, VisitNote_Id):
     except:
         return ({'NG'})
 
-def PostConsent(record, Consent_Id):
+def PostConsent(Consent_Id):
     try:
         CompositionjsonPath=str(pathlib.Path().absolute()) + "/Consent.json"
         Compositionjson = json.load(open(CompositionjsonPath,encoding="utf-8"), strict=False)
