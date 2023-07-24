@@ -6,7 +6,7 @@ import resourceType
 import psycopg2
 
 #fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
-fhir = 'http://192.168.211:8080/fhir/'#mshfhir vpn
+fhir = 'http://192.168.211.9:8080/fhir/'#mshfhir vpn
 
 apikey="Pw4jsj8hxJJQTY1I"
 
