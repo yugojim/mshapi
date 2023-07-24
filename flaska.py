@@ -15,10 +15,8 @@ import Function
 #eb	資源值在參數值之前結束	參數值的範圍與資源值的範圍不重疊，參數值下面的範圍包含資源值的範圍
 #ap	資源值與參數值大致相同。#請注意，近似值的建議值是規定值的 10%（對於日期，現在是和日期之間差距的 10%），但系統可能會在適當的情況下選擇其他值
 
-#fhir = 'http://104.208.68.39:8080/fhir/'#4600VM
-#fhir = 'http://202.5.253.182:8080/fhir/'#mshtest
-fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
-#fhir = 'http://103.124.74.158:8080/fhir/'#mshfhir
+#fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
+fhir = 'http://http://192.168.211:8080/fhir/'#mshfhir vpn
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -170,7 +168,6 @@ def query_VisitNoteID(VisitNote_Id):
 @app.route('/VisitNote/<string:VisitNote_Id>', methods=['POST'])
 @cross_origin()
 def create_VisitNote(VisitNote_Id):
-    Function.postlog(request)
     record = xmltodict.parse(request.data)
     Composition, status_code = Function.PostVisitNote(record, VisitNote_Id)
     return jsonify(Composition), status_code

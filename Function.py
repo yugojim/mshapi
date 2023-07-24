@@ -1,15 +1,12 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import pathlib
 import requests
 import resourceType
 import psycopg2
 
-
-#fhir = 'http://104.208.68.39:8080/fhir/'#4600VM
-#fhir = 'http://202.5.253.182:8080/fhir/'#mshtest
-fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
-#fhir = 'http://103.124.74.158:8080/fhir/'#mshfhir
+#fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
+fhir = 'http://192.168.211:8080/fhir/'#mshfhir vpn
 
 apikey="Pw4jsj8hxJJQTY1I"
 
@@ -36,12 +33,13 @@ def postlog(request):
     method = request.method
     host_url  = request.host_url
     headers=dict(request.headers)
-    conn = psycopg2.connect(database="consent", user="postgres", password="1qaz@WSX3edc", host="203.145.222.60", port="5432")
+    #conn = psycopg2.connect(database="consent", user="postgres", password="1qaz@WSX3edc", host="203.145.222.60", port="5432")
+    conn = psycopg2.connect(database="consent", user="postgres", password="1qaz@WSX3edc", host="192.168.211.19", port="5432")
     #print('Opened database')
     cur = conn.cursor()
     #sql="INSERT INTO public.log (ip_addr, method, host_url, headers, datetime ) VALUES ( '123.123.123.123', 'GET', 'http://1', 'header', '2023-10-11 08:12:22');"
     sql="INSERT INTO public.log (ip_addr, method, host_url, headers, datetime ) VALUES ('" + ip_addr + "', '" + \
-            method + "', '" + host_url + "', '" + json.dumps(headers) + "', '" + datetime.now().strftime("%Y/%m/%d %H:%M:%S") + "');"
+            method + "', '" + host_url + "', '" + json.dumps(headers) + "', '" + datetime.now()+timedelta(hours=8).strftime("%Y/%m/%d %H:%M:%S") + "');"
     #print(sql)
     cur.execute(sql)
     conn.commit()
