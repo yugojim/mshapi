@@ -34,7 +34,7 @@ Deposit['apikey']= apikey
 def postlog(request):
     ip_addr = request.remote_addr
     method = request.method
-    host_url  = request.host_url
+    host_url  = request.url
     headers=dict(request.headers)
     conn = psycopg2.connect(database="consent", user="postgres", password="1qaz@WSX3edc", host=postgresip, port="5432")
     #print('Opened database')
