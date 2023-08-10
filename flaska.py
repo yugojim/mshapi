@@ -127,7 +127,7 @@ def query_VisitNote():
     if request.args.get('Patient_Id') != None:
         conn = psycopg2.connect(database="consent", user="postgres", password="1qaz@WSX3edc", host=postgresip, port="5432")
         cur = conn.cursor()
-        consentsql = 'SELECT "PID" FROM consent where "PID" = \''+ 'B120450348' +'\';'
+        consentsql = 'SELECT "PID" FROM consent where "PID" = \''+ request.args.get('Patient_Id') +'\';'
         cur.execute(consentsql)
         rows = cur.fetchall()
         SELECTint=len(rows)
