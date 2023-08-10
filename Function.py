@@ -5,10 +5,10 @@ import requests
 import resourceType
 import psycopg2
 
-#fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
-#postgresip = "203.145.222.60"
-fhir = 'http://192.168.211.9:8080/fhir/'#mshfhir vpn
-postgresip = "192.168.211.19"
+fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
+postgresip = "203.145.222.60"
+#fhir = 'http://192.168.211.9:8080/fhir/'#mshfhir vpn
+#postgresip = "192.168.211.19"
 
 
 apikey="Pw4jsj8hxJJQTY1I"
