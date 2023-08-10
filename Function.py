@@ -5,10 +5,10 @@ import requests
 import resourceType
 import psycopg2
 
-fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
-postgresip = "203.145.222.60"
-#fhir = 'http://192.168.211.9:8080/fhir/'#mshfhir vpn
-#postgresip = "192.168.211.19"
+#fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
+#postgresip = "203.145.222.60"
+fhir = 'http://192.168.211.9:8080/fhir/'#mshfhir vpn
+postgresip = "192.168.211.19"
 
 
 apikey="Pw4jsj8hxJJQTY1I"
@@ -232,7 +232,7 @@ def PostDischargeSummary(record, DischargeSummary_Id):
             elif Postxml['recordTarget']['patientRole']['patient']['administrativeGenderCode']['@code']  == 'M':
                 gender='male'
             else:
-                gender='unknow'
+                gender='unknown'
             BIRTH_DATE = Postxml['recordTarget']['patientRole']['patient']['birthTime']['@value'][0:4] + '-' + Postxml['recordTarget']['patientRole']['patient']['birthTime']['@value'][4:6] + '-' + Postxml['recordTarget']['patientRole']['patient']['birthTime']['@value'][6:8] 
             patientjson = resourceType.patientjson(str(Postxml['recordTarget']['patientRole']['patient']['id']['@extension']), Postxml['recordTarget']['patientRole']['patient']['name'][1:], Postxml['recordTarget']['patientRole']['patient']['name'][0],\
                                                    gender, BIRTH_DATE)    
@@ -376,6 +376,7 @@ def PostConsent(Consent_Id):
     try:
         CompositionjsonPath=str(pathlib.Path().absolute()) + "/Consent.json"
         Compositionjson = json.load(open(CompositionjsonPath,encoding="utf-8"), strict=False)
+        '''
         try:
             string_to_sign = str.encode(Consent_Id)
             signature = private_key.sign(
@@ -393,6 +394,7 @@ def PostConsent(Consent_Id):
             Compositionjson['text']=tpoof
         except:
             None
+        '''
         Compositionjson['id'] = Consent_Id
         Compositionjson['status'] = "active"
         Compositionjson['dateTime']=datetime.now().strftime("%Y-%m-%dT%H:%M:%S")

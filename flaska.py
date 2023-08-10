@@ -4,7 +4,7 @@ from flask_cors import CORS, cross_origin
 import requests
 import xmltodict
 import Function
-
+import psycopg2
 #eq	資源值等於或完全包含在參數值中	參數值的範圍完全包含資源值的範圍
 #ne	資源值不等於參數值	參數值的範圍不完全包含資源值的範圍
 #gt	資源值大於參數值	參數值上方的範圍與資源值的範圍相交（即重疊）
@@ -15,8 +15,10 @@ import Function
 #eb	資源值在參數值之前結束	參數值的範圍與資源值的範圍不重疊，參數值下面的範圍包含資源值的範圍
 #ap	資源值與參數值大致相同。#請注意，近似值的建議值是規定值的 10%（對於日期，現在是和日期之間差距的 10%），但系統可能會在適當的情況下選擇其他值
 
-fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
-#fhir = 'http://192.168.211.9:8080/fhir/'#mshfhir vpn
+#fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
+fhir = 'http://192.168.211.9:8080/fhir/'#mshfhir vpn
+#postgresip = "203.145.222.60"
+postgresip = "192.168.211.22"
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -123,12 +125,23 @@ def query_VisitNote():
     Function.postlog(request)
     Search=''
     if request.args.get('Patient_Id') != None:
+        conn = psycopg2.connect(database="consent", user="postgres", password="1qaz@WSX3edc", host=postgresip, port="5432")
+        cur = conn.cursor()
+        consentsql = 'SELECT "PID" FROM consent where "PID" = \''+ 'B120450348' +'\';'
+        cur.execute(consentsql)
+        rows = cur.fetchall()
+        SELECTint=len(rows)
+        conn.close()
+        #print(SELECTint)        
         Search = 'patient=' + request.args.get('Patient_Id') + '&'
+        '''
         Consenturl = fhir + 'Consent/' + str(request.args.get('Patient_Id'))
         #print(Consenturl)
         Consenturlresponse = requests.request("GET", Consenturl, headers={}, data={}, verify=False)
         Consenturlresponseresultjson=json.loads(Consenturlresponse.text)
-        if Consenturlresponse.status_code != 404:
+        '''
+        if SELECTint > 0:
+        #if Consenturlresponse.status_code != 404:
             if request.args.get('mtDate') != None:
                 Search = Search + 'date=ge' + request.args.get('mtDate') + '&'        
             if request.args.get('ltDate') != None:
@@ -140,20 +153,13 @@ def query_VisitNote():
             resultjson=json.loads(response.text)
             return jsonify(resultjson), 200
         else:
-            return jsonify(Consenturlresponseresultjson), 404
-'''
-#skh
-@app.route('/VisitNote/', methods=['GET'])
-@cross_origin()
-def query_VisitNote():
-    url = fhir + 'Composition?title=門診'
-    response = requests.request("GET", url, headers={}, data={}, verify=False)
-    resultjson=json.loads(response.text)
-    return jsonify(resultjson), 200
-'''    
+            return "<p>no informed consent</p>"
+            #return jsonify(Consenturlresponseresultjson), 404
+
 @app.route('/VisitNote/<string:VisitNote_Id>', methods=['GET'])
 @cross_origin()
 def query_VisitNoteID(VisitNote_Id):
+    Function.postlog(request)
     Consenturl = fhir + 'Consent/' + VisitNote_Id
     Consenturlresponse = requests.request("GET", Consenturl, headers={}, data={}, verify=False)
     Consenturlresponseresultjson=json.loads(Consenturlresponse.text)
@@ -168,6 +174,7 @@ def query_VisitNoteID(VisitNote_Id):
 @app.route('/VisitNote/<string:VisitNote_Id>', methods=['POST'])
 @cross_origin()
 def create_VisitNote(VisitNote_Id):
+    Function.postlog(request)
     record = xmltodict.parse(request.data)
     Composition, status_code = Function.PostVisitNote(record, VisitNote_Id)
     return jsonify(Composition), status_code
