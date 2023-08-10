@@ -18,7 +18,7 @@ import psycopg2
 #fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
 fhir = 'http://192.168.211.9:8080/fhir/'#mshfhir vpn
 #postgresip = "203.145.222.60"
-postgresip = "192.168.211.22"
+postgresip = "192.168.211.19"
 
 app = Flask(__name__)
 cors = CORS(app)
