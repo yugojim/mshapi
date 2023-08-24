@@ -15,10 +15,10 @@ import psycopg2
 #eb	資源值在參數值之前結束	參數值的範圍與資源值的範圍不重疊，參數值下面的範圍包含資源值的範圍
 #ap	資源值與參數值大致相同。#請注意，近似值的建議值是規定值的 10%（對於日期，現在是和日期之間差距的 10%），但系統可能會在適當的情況下選擇其他值
 
-#fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
-fhir = 'http://192.168.211.9:8080/fhir/'#mshfhir vpn
-#postgresip = "203.145.222.60"
-postgresip = "192.168.211.19"
+fhir = 'http://211.73.81.25:8080/fhir/'#mshfhir
+#fhir = 'http://192.168.211.9:8080/fhir/'#mshfhir vpn
+postgresip = "203.145.222.60"
+#postgresip = "192.168.211.19"
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -153,7 +153,8 @@ def query_VisitNote():
             resultjson=json.loads(response.text)
             return jsonify(resultjson), 200
         else:
-            return "<p>no informed consent</p>"
+            resultjson=json.loads('{"resourceType": "Consent","total": 0,"type": "searchset"}')
+            return jsonify(resultjson), 200
             #return jsonify(Consenturlresponseresultjson), 404
 
 @app.route('/VisitNote/<string:VisitNote_Id>', methods=['GET'])
